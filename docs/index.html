@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>scribe · select text on your screen, like Google Lens</title>
-<meta name="description" content="scribe is a Quickshell module for Hyprland. Drag a box around any text on screen, select it like real text and copy it.">
+<meta name="description" content="scribe is a Quickshell module for Hyprland. Drag a box around any text on screen, select it like real text, copy it and, if you switch it on, translate it.">
 <meta name="color-scheme" content="dark">
 <meta property="og:title" content="scribe">
 <meta property="og:description" content="Select and copy text from anywhere on your Hyprland screen, like Google Lens.">
@@ -136,6 +136,8 @@ footer a{color:var(--dim)}
       <a href="#how" data-en="How it works" data-tr="Nasıl çalışır">How it works</a>
       <a href="#install" data-en="Install" data-tr="Kurulum">Install</a>
       <a href="#languages" data-en="Languages" data-tr="Diller">Languages</a>
+      <a href="#translate" data-en="Translate" data-tr="Çeviri">Translate</a>
+      <a href="docs.html" data-en="Docs" data-tr="Dokümantasyon">Docs</a>
       <a class="gh" href="https://github.com/lunanoir21/scribe">GitHub</a>
     </div>
     <div class="lang" role="group" aria-label="Language"><button type="button" data-l="en" aria-pressed="true">EN</button><button type="button" data-l="tr" aria-pressed="false">TR</button></div>
@@ -184,6 +186,8 @@ footer a{color:var(--dim)}
       <div><h3 data-en="One window" data-tr="Tek pencere">One window</h3><p data-en="Picker, scan animation and result share one layer-shell window, so nothing flickers between steps." data-tr="Seçici, tarama animasyonu ve sonuç tek bir layer-shell penceresini paylaşır, adımlar arasında titreme olmaz.">Picker, scan animation and result share one layer-shell window, so nothing flickers between steps.</p></div>
       <div><h3 data-en="Dark themes just work" data-tr="Koyu temalar sorunsuz">Dark themes just work</h3><p data-en="Light text on a dark background is inverted before reading. Small selections are read at 2x, shaky reads are retried once." data-tr="Koyu zemindeki açık yazı okunmadan önce ters çevrilir. Küçük seçimler 2 kat büyütülerek okunur, şüpheli okumalar bir kez daha denenir.">Light text on a dark background is inverted before reading. Small selections are read at 2x, shaky reads are retried once.</p></div>
       <div><h3 data-en="Languages from settings" data-tr="Ayarlardan diller">Languages from settings</h3><p data-en="A gear opens settings. For a missing language you pick: download it straight into your home folder, or install it with your package manager." data-tr="Dişli ayarları açar. Eksik bir dil için seçersin: doğrudan ev klasörüne indir ya da paket yöneticinle kur.">A gear opens settings. For a missing language you pick: download it straight into your home folder, or install it with your package manager.</p></div>
+      <div><h3 data-en="Translate, when you ask" data-tr="İstediğinde çevir">Translate, when you ask</h3><p data-en="Off until you switch it on. Then a Translate button appears: a side-by-side card or the translation painted right over the text, offline or online." data-tr="Sen açana kadar kapalı. Açınca bir Çevir düğmesi çıkar: yan yana bir kart ya da doğrudan yazının üstüne çizilen çeviri, çevrimdışı ya da çevrimiçi.">Off until you switch it on. Then a Translate button appears: a side-by-side card or the translation painted right over the text, offline or online.</p></div>
+      <div><h3 data-en="Dictionary and smart actions" data-tr="Sözlük ve akıllı eylemler">Dictionary and smart actions</h3><p data-en="Hover a word for its meaning. Links, e-mail addresses, phone numbers and IBANs in the text become buttons." data-tr="Anlamı için bir kelimenin üstüne gel. Metindeki bağlantılar, e-postalar, telefon numaraları ve IBAN'lar düğme olur.">Hover a word for its meaning. Links, e-mail addresses, phone numbers and IBANs in the text become buttons.</p></div>
       <div><h3 data-en="Reversible install" data-tr="Geri alınabilir kurulum">Reversible install</h3><p data-en="The installer backs files up and wraps its edits in marker comments. --uninstall puts everything back." data-tr="Yükleyici dosyaları yedekler ve değişikliklerini işaret yorumlarıyla sarar. --uninstall her şeyi geri koyar.">The installer backs files up and wraps its edits in marker comments. --uninstall puts everything back.</p></div>
     </div>
   </section>
@@ -211,6 +215,18 @@ cd scribe
 ./install.sh --patch      <span class="c"># adds the import, the host and Super+Shift+T</span></pre>
     <p class="lead" data-en="On Omarchy, install it as a shell plugin instead: omarchy plugin add https://github.com/lunanoir21/scribe-omarchy.git --enable" data-tr="Omarchy'de bunun yerine kabuk eklentisi olarak kur: omarchy plugin add https://github.com/lunanoir21/scribe-omarchy.git --enable">On Omarchy, install it as a shell plugin instead: omarchy plugin add https://github.com/lunanoir21/scribe-omarchy.git --enable</p>
     <p class="lead" data-en="Without --patch the script only copies the files and prints the lines to add. Run ./install.sh --uninstall to remove everything it added." data-tr="--patch olmadan betik yalnızca dosyaları kopyalar ve eklemen gereken satırları yazdırır. Eklediği her şeyi kaldırmak için ./install.sh --uninstall çalıştır.">Without --patch the script only copies the files and prints the lines to add. Run ./install.sh --uninstall to remove everything it added.</p>
+  </section>
+
+  <section id="translate">
+    <p class="lab" data-en="Translation" data-tr="Çeviri">Translation</p>
+    <h2 data-en="Translate what you read. Only when you ask." data-tr="Okuduğunu çevir. Yalnızca sen istediğinde.">Translate what you read. Only when you ask.</h2>
+    <p class="lead" data-en="Translation is off by default. Switching it on in the settings shows a warning first: what it downloads, what it may send, how much memory it uses. While it is off nothing is downloaded, loaded or run." data-tr="Çeviri varsayılan olarak kapalıdır. Ayarlardan açmak önce bir uyarı gösterir: neyi indirdiği, neyi gönderebileceği, ne kadar bellek kullandığı. Kapalıyken hiçbir şey indirilmez, yüklenmez ya da çalıştırılmaz.">Translation is off by default. Switching it on in the settings shows a warning first: what it downloads, what it may send, how much memory it uses. While it is off nothing is downloaded, loaded or run.</p>
+    <div class="grid">
+      <div><h3 data-en="Offline or online" data-tr="Çevrimdışı ya da çevrimiçi">Offline or online</h3><p data-en="Offline (English and Turkish) runs on your machine and nothing leaves it. Online covers 14 languages through MyMemory and asks before it sends a word." data-tr="Çevrimdışı (İngilizce ve Türkçe) kendi makinende çalışır ve hiçbir şey dışarı çıkmaz. Çevrimiçi, MyMemory ile 14 dili kapsar ve tek kelime göndermeden önce sorar.">Offline (English and Turkish) runs on your machine and nothing leaves it. Online covers 14 languages through MyMemory and asks before it sends a word.</p></div>
+      <div><h3 data-en="Card or in place" data-tr="Kart ya da yerinde">Card or in place</h3><p data-en="The card shows original and translation side by side and lets you fix a misread word. In place paints the translation over the text, sized to fit." data-tr="Kart, orijinali ve çeviriyi yan yana gösterir ve yanlış okunan kelimeyi düzeltmene izin verir. Yerinde, çeviriyi sığacak boyutta yazının üstüne çizer.">The card shows original and translation side by side and lets you fix a misread word. In place paints the translation over the text, sized to fit.</p></div>
+      <div><h3 data-en="Light on memory" data-tr="Belleği az kullanır">Light on memory</h3><p data-en="The model loads when you press Translate and is released after two idle minutes. Pinned packages and SHA-256 verified models, in an isolated environment." data-tr="Model Çevir'e basınca yüklenir ve iki dakika boşta kalınca bırakılır. Sabitlenmiş paketler ve SHA-256 ile doğrulanan modeller, izole bir ortamda.">The model loads when you press Translate and is released after two idle minutes. Pinned packages and SHA-256 verified models, in an isolated environment.</p></div>
+    </div>
+    <p class="lead"><a href="docs.html" data-en="Read the documentation" data-tr="Dokümantasyonu oku">Read the documentation</a></p>
   </section>
 
   <section id="languages">
@@ -253,6 +269,7 @@ cd scribe
   <div class="wrap">
     <span>scribe · MIT · © 2026 luna</span>
     <a href="https://github.com/lunanoir21/scribe">GitHub</a>
+    <a href="docs.html">Docs</a>
     <a href="https://github.com/lunanoir21/scribe/blob/main/README.md">README</a>
     <a href="https://github.com/lunanoir21/scribe/blob/main/CHANGELOG.md">Changelog</a>
     <a href="https://github.com/lunanoir21/scribe/blob/main/README.tr.md">Türkçe</a>
