@@ -256,7 +256,11 @@ class SourceRuleTests(unittest.TestCase):
             text = p.read_text()
             count += len(re.findall(r'\["sh",\s*"-c"', text))
             for call in re.findall(r"execDetached\(\[([^\]]*)\]", text):
-                self.assertTrue(call.strip().startswith('"notify-send"'), f"{p.name}: {call}")
+                # one more program: the translator opens a link with xdg-open, and only after
+                # checking that it is an http(s) or mailto: address (see test_translate.py)
+                ok = call.strip().startswith('"notify-send"') or (
+                    p.name == "ScribeTranslator.qml" and call.strip().startswith('"xdg-open"'))
+                self.assertTrue(ok, f"{p.name}: {call}")
         self.assertLessEqual(count, allowed_sh_c)
 
     def test_copied_text_never_reaches_a_command_line(self):

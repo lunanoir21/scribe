@@ -6,3 +6,4 @@ ScribeLens 1.0 ScribeLens.qml
 ScribeBarButton 1.0 ScribeBarButton.qml
 ScribeSwitch 1.0 ScribeSwitch.qml
 ScribeSettings 1.0 ScribeSettings.qml
+ScribeTranslator 1.0 ScribeTranslator.qml
