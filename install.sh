@@ -105,7 +105,7 @@ fi
 
 # ── copy ─────────────────────────────────────────────────────────────────────
 mkdir -p "$TARGET/ui"
-install -m 755 "$HERE/scribe.sh" "$HERE/ocr.py" "$HERE/langs.py" "$HERE/config.py" "$TARGET/"
+install -m 755 "$HERE/scribe.sh" "$HERE/ocr.py" "$HERE/langs.py" "$HERE/config.py" "$HERE/translate.py" "$TARGET/"
 install -m 644 "$HERE"/ui/*.qml "$HERE/ui/qmldir" "$TARGET/ui/"
 # a leftover settings.json from 0.1.x lived inside the module and is no longer read
 rm -f -- "$TARGET/settings.json"
