@@ -19,9 +19,8 @@ jobs:
       - name: Install tools
         run: |
           python -m pip install --upgrade pip
-          python -m pip install numpy pillow ruff
-          sudo apt-get update
-          sudo apt-get install -y shellcheck
+          # pinned, so a newer runner image cannot change what the lint step reports
+          python -m pip install numpy pillow ruff==0.16.10 shellcheck-py==0.11.0.1
       - name: Lint Python
         run: ruff check .
       - name: Lint shell
