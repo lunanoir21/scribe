@@ -20,6 +20,7 @@ PanelWindow {
     property color highlight: "#8ab4f8"
     property rect rect: Qt.rect(0, 0, 0, 0)
     property string devSel: ""         // dev only: pre-select "lo,hi" after the read
+    property var devDrag: null         // dev only: show a region as if it were being dragged
 
     // settings panel
     property var cfg: ({})
@@ -161,6 +162,17 @@ PanelWindow {
     Timer { id: closeTimer; interval: 750; onTriggered: win.cancelled() }
     Timer { id: hintTimer; interval: 2600; onTriggered: win.hint = "" }
 
+    function applyDevDrag() {
+        if (devDrag && phase === "select") {
+            sx = devDrag.x; sy = devDrag.y;
+            ex = devDrag.x + devDrag.w; ey = devDrag.y + devDrag.h;
+            mx = ex; my = ey;
+            has = true;
+        }
+    }
+    onDevDragChanged: applyDevDrag()
+    Component.onCompleted: applyDevDrag()
+
     onPhaseChanged: {
         if (phase !== "result")
             return;
@@ -171,15 +183,15 @@ PanelWindow {
                 selectAll();
                 doCopy();
             } else {
-                hint = "Metni sürükleyerek seç";
+                hint = ScribeStrings.s.dragHint;
                 hintTimer.restart();
             }
         } else if (status === "low") {
-            hint = "Güven düşük (%" + confidence + ")  ·  yine de seçebilirsin";
+            hint = ScribeStrings.s.lowConf(confidence);
         } else if (status === "empty") {
-            hint = "Metin bulunamadı";
+            hint = ScribeStrings.s.noText;
         } else {
-            hint = "Dil paketi eksik";
+            hint = ScribeStrings.s.noLang;
         }
         if (devSel !== "" && words.length > 0) {
             var p = devSel.split(",");
@@ -261,7 +273,7 @@ PanelWindow {
             visible: win.phase === "select" && !win.has
             anchors.horizontalCenter: parent.horizontalCenter
             y: 44
-            text: "Alanı sürükle      Esc iptal"
+            text: ScribeStrings.s.dragRegion
             font.family: ScribeTheme.mono; font.pixelSize: 12
             color: ScribeTheme.text
             opacity: 0.85
@@ -294,7 +306,7 @@ PanelWindow {
             Text {
                 id: readLbl
                 anchors.centerIn: parent
-                text: "OKUNUYOR"
+                text: ScribeStrings.s.reading
                 font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.2; font.weight: Font.DemiBold
                 color: ScribeTheme.ink
             }
@@ -383,7 +395,7 @@ PanelWindow {
                 spacing: 0
 
                 ScribeBarButton {
-                    label: win.copied ? "Kopyalandı" : "Kopyala"
+                    label: win.copied ? ScribeStrings.s.copied : ScribeStrings.s.copy
                     done: win.copied
                     onActivated: win.doCopy()
                 }
@@ -392,7 +404,7 @@ PanelWindow {
 
                 ScribeBarButton {
                     visible: !win.copied
-                    label: "Tümünü seç"
+                    label: ScribeStrings.s.selectAll
                     onActivated: win.selectAll()
                 }
             }

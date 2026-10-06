@@ -23,16 +23,9 @@ Rectangle {
     signal runTerminal(string code)
     signal closeRequested()
 
-    readonly property var catalog: [
-        { code: "tur", name: "Türkçe" }, { code: "eng", name: "İngilizce" },
-        { code: "deu", name: "Almanca" }, { code: "fra", name: "Fransızca" },
-        { code: "spa", name: "İspanyolca" }, { code: "ita", name: "İtalyanca" },
-        { code: "por", name: "Portekizce" }, { code: "nld", name: "Felemenkçe" },
-        { code: "pol", name: "Lehçe" }, { code: "ukr", name: "Ukraynaca" },
-        { code: "rus", name: "Rusça" }, { code: "ara", name: "Arapça" },
-        { code: "jpn", name: "Japonca" }, { code: "kor", name: "Korece" },
-        { code: "chi_sim", name: "Çince (Basit)" }
-    ]
+    readonly property var codes: ["tur", "eng", "deu", "fra", "spa", "ita", "por", "nld", "pol", "ukr",
+                                  "rus", "ara", "jpn", "kor", "chi_sim"]
+    readonly property var catalog: codes.map(function (c) { return { code: c, name: ScribeStrings.s.langNames[c] }; })
     readonly property var active: (cfg.langs || "").split("+").filter(function (x) { return x !== ""; })
     readonly property var swatches: ["#8ab4f8", "#ffffff", "#81c995", "#fdd663", "#f28b82"]
 
@@ -73,7 +66,7 @@ Rectangle {
         // header
         Item {
             width: parent.width; height: 24
-            Text { text: "Ayarlar"; anchors.verticalCenter: parent.verticalCenter; font.family: ScribeTheme.mono; font.pixelSize: 14; font.weight: Font.DemiBold; color: ScribeTheme.text }
+            Text { text: ScribeStrings.s.settings; anchors.verticalCenter: parent.verticalCenter; font.family: ScribeTheme.mono; font.pixelSize: 14; font.weight: Font.DemiBold; color: ScribeTheme.text }
             Rectangle {
                 anchors.right: parent.right
                 width: 24; height: 24; radius: 12
@@ -85,7 +78,7 @@ Rectangle {
         }
 
         // languages
-        Text { text: "OKUMA DİLLERİ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+        Text { text: ScribeStrings.s.readingLangs; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
 
         Rectangle {
             width: parent.width
@@ -150,7 +143,7 @@ Rectangle {
                                 visible: row.ok
                                 anchors.right: parent.right; anchors.rightMargin: 14
                                 anchors.verticalCenter: parent.verticalCenter
-                                text: "kurulu"; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.faint
+                                text: ScribeStrings.s.installed; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.faint
                             }
                             Row {
                                 visible: row.busy
@@ -183,7 +176,7 @@ Rectangle {
                                 compact: true
                                 anchors.right: parent.right; anchors.rightMargin: 8
                                 anchors.verticalCenter: parent.verticalCenter
-                                label: "İndir"
+                                label: ScribeStrings.s.download
                                 enabled: panel.installing === "" && panel.terminalCode === ""
                                 opacity: enabled ? 1 : 0.4
                                 onActivated: panel.chooseLang(row.modelData.code)
@@ -215,7 +208,7 @@ Rectangle {
 
                 Item {
                     width: parent.width; height: 20
-                    Text { anchors.verticalCenter: parent.verticalCenter; text: panel.nameOf(panel.choiceCode) + " nasıl kurulsun?"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.DemiBold; color: ScribeTheme.text }
+                    Text { anchors.verticalCenter: parent.verticalCenter; text: ScribeStrings.s.howInstall(panel.nameOf(panel.choiceCode)); font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.DemiBold; color: ScribeTheme.text }
                     Text { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: "×"; font.pixelSize: 16; color: ScribeTheme.dim
                         MouseArea { anchors.fill: parent; anchors.margins: -6; cursorShape: Qt.PointingHandCursor; onClicked: panel.cancelChoice() } }
                 }
@@ -230,8 +223,8 @@ Rectangle {
                     Behavior on scale { NumberAnimation { duration: 80 } }
                     Column {
                         anchors.verticalCenter: parent.verticalCenter; x: 12; spacing: 3
-                        Text { text: "Doğrudan indir"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
-                        Text { text: "Parola gerekmez, ev klasörüne iner"; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim }
+                        Text { text: ScribeStrings.s.direct; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
+                        Text { text: ScribeStrings.s.directHint; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim }
                     }
                     MouseArea { id: o1; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.installLang(panel.choiceCode) }
                 }
@@ -247,10 +240,11 @@ Rectangle {
                     Column {
                         id: o2col
                         x: 12; y: 12; width: parent.width - 24; spacing: 8
-                        Row {
+                        Flow {
+                            width: parent.width
                             spacing: 8
-                            Text { text: "Paket yöneticisiyle kur"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
-                            Text { text: "parola ister"; anchors.baseline: parent.children[0].baseline; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim }
+                            Text { text: ScribeStrings.s.viaPm; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
+                            Text { text: ScribeStrings.s.asksPassword; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim; topPadding: 3 }
                         }
                         Rectangle {
                             width: parent.width; height: cmdText.implicitHeight + 16; radius: 6
@@ -260,13 +254,13 @@ Rectangle {
                         Row {
                             spacing: 8
                             visible: panel.terminalCode === ""
-                            ScribeBarButton { compact: true; label: "Komutu kopyala"; onActivated: panel.copyCommand() }
-                            ScribeBarButton { compact: true; label: "Terminalde çalıştır"; onActivated: panel.runTerminal(panel.choiceCode) }
+                            ScribeBarButton { compact: true; label: ScribeStrings.s.copyCommand; onActivated: panel.copyCommand() }
+                            ScribeBarButton { compact: true; label: ScribeStrings.s.runTerminal; onActivated: panel.runTerminal(panel.choiceCode) }
                         }
                         Row {
                             spacing: 8
                             visible: panel.terminalCode !== ""
-                            Text { text: "Terminal açık, bitince liste yenilenir"; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.dim }
+                            Text { text: ScribeStrings.s.terminalOpen; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.dim }
                         }
                     }
                 }
@@ -277,19 +271,19 @@ Rectangle {
             width: parent.width
             wrapMode: Text.Wrap
             text: panel.installMsg !== "" ? panel.installMsg
-                : "İndir'e basınca iki yol sunulur: parolasız doğrudan indirme ya da " + (panel.pmName || "paket yöneticisi") + (panel.osName ? " (" + panel.osName + ")" : "") + " ile kurulum (parola ister)."
+                : ScribeStrings.s.installInfo(panel.pmName || ScribeStrings.s.pmFallback, panel.osName)
             font.family: ScribeTheme.mono; font.pixelSize: 11; lineHeight: 1.4
             color: panel.installMsg !== "" ? ScribeTheme.text : ScribeTheme.faint
         }
 
         Rectangle { width: parent.width; height: 1; color: ScribeTheme.line }
-        Text { text: "DAVRANIŞ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+        Text { text: ScribeStrings.s.behaviour; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
 
         Repeater {
             model: [
-                { key: "closeAfterCopy", label: "Kopyalayınca kapat" },
-                { key: "autoCopy", label: "Okuyunca hepsini kopyala" },
-                { key: "joinLines", label: "Paragraf satırlarını birleştir" }
+                { key: "closeAfterCopy", label: ScribeStrings.s.closeAfterCopy },
+                { key: "autoCopy", label: ScribeStrings.s.autoCopy },
+                { key: "joinLines", label: ScribeStrings.s.joinLines }
             ]
             delegate: Item {
                 required property var modelData
@@ -304,7 +298,7 @@ Rectangle {
         }
 
         Rectangle { width: parent.width; height: 1; color: ScribeTheme.line }
-        Text { text: "VURGU RENGİ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+        Text { text: ScribeStrings.s.highlight; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
 
         Row {
             spacing: 10
@@ -321,6 +315,31 @@ Rectangle {
                     Behavior on scale { NumberAnimation { duration: 90 } }
                     Text { anchors.centerIn: parent; visible: parent.sel; text: "✓"; font.pixelSize: 13; font.weight: Font.Bold; color: "#0a0a0a" }
                     MouseArea { id: sw; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.changeCfg("highlight", parent.modelData) }
+                }
+            }
+        }
+
+        Rectangle { width: parent.width; height: 1; color: ScribeTheme.line }
+        Text { text: ScribeStrings.s.interfaceLang; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+
+        Row {
+            spacing: 6
+            Repeater {
+                model: [ { v: "auto", t: ScribeStrings.s.auto }, { v: "tr", t: "Türkçe" }, { v: "en", t: "English" } ]
+                delegate: Rectangle {
+                    required property var modelData
+                    readonly property bool sel: (panel.cfg.ui || "auto") === modelData.v
+                    height: 28
+                    width: uiTxt.implicitWidth + 28
+                    radius: 14
+                    color: sel ? ScribeTheme.text : (uiMa.containsMouse ? "#222222" : "transparent")
+                    border.width: 1
+                    border.color: sel ? ScribeTheme.text : ScribeTheme.line
+                    scale: uiMa.pressed ? 0.95 : 1
+                    Behavior on color { ColorAnimation { duration: 120 } }
+                    Behavior on scale { NumberAnimation { duration: 80 } }
+                    Text { id: uiTxt; anchors.centerIn: parent; text: modelData.t; font.family: ScribeTheme.mono; font.pixelSize: 12; color: parent.sel ? ScribeTheme.ink : ScribeTheme.text }
+                    MouseArea { id: uiMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.changeCfg("ui", parent.modelData.v) }
                 }
             }
         }
