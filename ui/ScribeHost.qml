@@ -54,6 +54,9 @@ Scope {
     property string installing: ""
     property int installPct: 0
     property string installMsg: ""
+    property string choiceCode: ""
+    property string choiceCmd: ""
+    property string terminalCode: ""
     readonly property string langsPy: baseDir + "langs.py"
 
     function refreshLangs() {
@@ -61,9 +64,27 @@ Scope {
         infoProc.running = true;
     }
 
+    function chooseLang(code) {
+        choiceCode = code;
+        choiceCmd = "";
+        installMsg = "";
+        cmdProc.command = ["python3", "-I", langsPy, "command", code];
+        cmdProc.running = true;
+    }
+
+    function runTerminal(code) {
+        if (terminalCode !== "")
+            return;
+        terminalCode = code;
+        installMsg = "";
+        termProc.command = ["python3", "-I", langsPy, "term", code];
+        termProc.running = true;
+    }
+
     function installLang(code) {
         if (installing !== "")
             return;
+        choiceCode = "";
         installing = code;
         installPct = 0;
         installMsg = "";
@@ -101,6 +122,8 @@ Scope {
         function cancel(): void { host.reset(); }
         // dev helper: open the settings panel of the running overlay
         function devopen(): void { if (lensLoader.item) lensLoader.item.settingsOpen = true; }
+        // dev helper: open the install-method card for a language
+        function devchoose(code: string): void { host.chooseLang(code); }
         // dev helper: skip the drag and read this region (logical px) straight away
         function testsel(x: real, y: real, w: real, h: real, lo: int, hi: int): void {
             host.devSel = lo + "," + hi;
@@ -196,6 +219,20 @@ Scope {
     Process { id: saveProc }
 
     Process {
+        id: cmdProc
+        stdout: StdioCollector { onStreamFinished: host.choiceCmd = text.trim() }
+    }
+
+    Process {
+        id: termProc
+        onExited: {
+            host.terminalCode = "";
+            host.refreshLangs();
+            host.installMsg = "Terminal kapandı, dil listesi yenilendi.";
+        }
+    }
+
+    Process {
         id: infoProc
         stdout: StdioCollector {
             onStreamFinished: {
@@ -253,6 +290,13 @@ Scope {
             pmName: host.pmName
             osName: host.osName
             onSetCfg: (k, v) => host.setCfg(k, v)
+            choiceCode: host.choiceCode
+            choiceCmd: host.choiceCmd
+            terminalCode: host.terminalCode
+            onChooseLang: code => host.chooseLang(code)
+            onCancelChoice: host.choiceCode = ""
+            onCopyCommand: { host.copy(host.choiceCmd); host.installMsg = "Komut kopyalandı, terminale yapıştır."; }
+            onRunTerminal: code => host.runTerminal(code)
             onInstallLang: code => host.installLang(code)
             onSettingsOpened: host.refreshLangs()
             rect: host.selRect

@@ -3,13 +3,14 @@
 
 usage:
   langs.py info              PM<TAB>name, DIR<TAB>path, then L<TAB>code<TAB>system|user per installed language
-  langs.py install <code>    install a language, printing MSG<TAB>text / PCT<TAB>n lines, exit 0 on success
-
-A pack is installed with the distro's package manager (asking for a password through
-pkexec) when the distro is known. If that is not possible, or fails, the tessdata_fast
-file is downloaded into ~/.local/share/scribe/tessdata instead, which needs no root.
+  langs.py install <code>    download the tessdata_fast file into ~/.local/share/scribe/tessdata
+                             (no password), printing MSG<TAB>text / PCT<TAB>n, exit 0 on success
+  langs.py install <code> --pm   install with the distro's package manager through pkexec
+  langs.py command <code>    print the package manager command to run by hand (needs a password)
+  langs.py term <code>       run that command in a terminal window and wait until it is closed
 """
 import os
+import shlex
 import shutil
 import subprocess
 import sys
@@ -118,6 +119,39 @@ def download(code):
     return True
 
 
+def pm_command(code):
+    """The shell command that installs `code` with the distro's package manager, or None."""
+    fam = family()
+    if not fam:
+        return None
+    pm, argv, pkg = FAMILIES[fam]
+    package = pkg.format(code=code, dash=code.replace("_", "-"))
+    return shlex.join(["sudo"] + [a for a in argv if a != "--noconfirm"] + [package])   # by hand: let the user confirm
+
+
+TERMINALS = [
+    ("kitty", ["kitty"]), ("foot", ["foot"]), ("alacritty", ["alacritty", "-e"]),
+    ("wezterm", ["wezterm", "start", "--"]), ("konsole", ["konsole", "-e"]),
+    ("gnome-terminal", ["gnome-terminal", "--"]), ("xfce4-terminal", ["xfce4-terminal", "-x"]),
+    ("xterm", ["xterm", "-e"]),
+]
+
+
+def run_in_terminal(code):
+    cmd = pm_command(code)
+    if not cmd:
+        say("Bu sistem için paket komutu bilinmiyor")
+        return 1
+    script = f'{cmd}; echo; read -r -p "Bitti. Kapatmak icin Enter tusuna bas " _'
+    wanted = os.environ.get("TERMINAL", "")
+    options = [t for t in TERMINALS if t[0] == os.path.basename(wanted)] + TERMINALS
+    for name, prefix in options:
+        if shutil.which(name):
+            return subprocess.call(prefix + ["sh", "-c", script])
+    say("Terminal bulunamadı")
+    return 1
+
+
 def via_package_manager(code):
     fam = family()
     if not fam:
@@ -135,23 +169,27 @@ def via_package_manager(code):
     return False
 
 
-def install(code):
+def install(code, use_pm=False):
     if not code.replace("_", "").isalnum():
         say("Geçersiz dil kodu")
         return 1
     if code in installed():
         say(f"{code} zaten kurulu")
         return 0
-    if via_package_manager(code) or download(code):
+    if use_pm and via_package_manager(code):
         return 0
-    return 1
+    return 0 if download(code) else 1
 
 
 if __name__ == "__main__":
     if len(sys.argv) >= 2 and sys.argv[1] == "info":
         info()
     elif len(sys.argv) >= 3 and sys.argv[1] == "install":
-        sys.exit(install(sys.argv[2]))
+        sys.exit(install(sys.argv[2], "--pm" in sys.argv[3:]))
+    elif len(sys.argv) >= 3 and sys.argv[1] == "command":
+        print(pm_command(sys.argv[2]) or "")
+    elif len(sys.argv) >= 3 and sys.argv[1] == "term":
+        sys.exit(run_in_terminal(sys.argv[2]))
     else:
         print(__doc__)
         sys.exit(64)

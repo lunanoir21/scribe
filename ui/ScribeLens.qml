@@ -29,7 +29,14 @@ PanelWindow {
     property string installMsg: ""
     property string pmName: ""
     property string osName: ""
+    property string choiceCode: ""
+    property string choiceCmd: ""
+    property string terminalCode: ""
     property bool settingsOpen: false
+    signal chooseLang(string code)
+    signal cancelChoice()
+    signal copyCommand()
+    signal runTerminal(string code)
     signal setCfg(string key, var value)
     signal installLang(string code)
     signal settingsOpened()
@@ -489,6 +496,13 @@ PanelWindow {
             installMsg: win.installMsg
             pmName: win.pmName
             osName: win.osName
+            choiceCode: win.choiceCode
+            choiceCmd: win.choiceCmd
+            terminalCode: win.terminalCode
+            onChooseLang: code => win.chooseLang(code)
+            onCancelChoice: win.cancelChoice()
+            onCopyCommand: win.copyCommand()
+            onRunTerminal: code => win.runTerminal(code)
             onChangeCfg: (k, v) => win.setCfg(k, v)
             onInstallLang: code => win.installLang(code)
             onCloseRequested: win.settingsOpen = false

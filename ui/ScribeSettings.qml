@@ -9,11 +9,18 @@ Rectangle {
     property string installing: ""      // code being installed right now
     property int installPct: 0
     property string installMsg: ""
+    property string choiceCode: ""      // language waiting for "how do you want to install it?"
+    property string choiceCmd: ""       // package manager command for it (empty if unknown)
+    property string terminalCode: ""    // language whose command is running in a terminal right now
     property string pmName: ""          // e.g. "pacman"
     property string osName: ""          // e.g. "CachyOS"
 
     signal changeCfg(string key, var value)
-    signal installLang(string code)
+    signal chooseLang(string code)
+    signal cancelChoice()
+    signal installLang(string code)      // direct download, no password
+    signal copyCommand()
+    signal runTerminal(string code)
     signal closeRequested()
 
     readonly property var catalog: [
@@ -30,6 +37,11 @@ Rectangle {
     readonly property var swatches: ["#8ab4f8", "#ffffff", "#81c995", "#fdd663", "#f28b82"]
 
     function isInstalled(code) { return installed.indexOf(code) >= 0; }
+    function nameOf(code) {
+        for (var i = 0; i < catalog.length; i++)
+            if (catalog[i].code === code) return catalog[i].name;
+        return code;
+    }
     function toggleLang(code) {
         var a = active.slice();
         var i = a.indexOf(code);
@@ -172,10 +184,89 @@ Rectangle {
                                 anchors.right: parent.right; anchors.rightMargin: 8
                                 anchors.verticalCenter: parent.verticalCenter
                                 label: "İndir"
-                                enabled: panel.installing === ""
+                                enabled: panel.installing === "" && panel.terminalCode === ""
                                 opacity: enabled ? 1 : 0.4
-                                onActivated: panel.installLang(row.modelData.code)
+                                onActivated: panel.chooseLang(row.modelData.code)
                             }
+                        }
+                    }
+                }
+            }
+        }
+
+        // how to install: direct download (no password) or the package manager (password)
+        Rectangle {
+            id: choice
+            visible: panel.choiceCode !== ""
+            width: parent.width
+            implicitHeight: choiceCol.implicitHeight + 24
+            radius: 8
+            color: ScribeTheme.surface
+            border.width: 1
+            border.color: ScribeTheme.lineStrong
+            opacity: visible ? 1 : 0
+            Behavior on opacity { NumberAnimation { duration: 160 } }
+
+            Column {
+                id: choiceCol
+                x: 12; y: 12
+                width: parent.width - 24
+                spacing: 10
+
+                Item {
+                    width: parent.width; height: 20
+                    Text { anchors.verticalCenter: parent.verticalCenter; text: panel.nameOf(panel.choiceCode) + " nasıl kurulsun?"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.DemiBold; color: ScribeTheme.text }
+                    Text { anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter; text: "×"; font.pixelSize: 16; color: ScribeTheme.dim
+                        MouseArea { anchors.fill: parent; anchors.margins: -6; cursorShape: Qt.PointingHandCursor; onClicked: panel.cancelChoice() } }
+                }
+
+                // option 1
+                Rectangle {
+                    width: parent.width; height: 54; radius: 8
+                    color: o1.pressed ? "#2a2a2a" : (o1.containsMouse ? "#1f1f1f" : "transparent")
+                    border.width: 1; border.color: o1.containsMouse ? ScribeTheme.lineStrong : ScribeTheme.line
+                    scale: o1.pressed ? 0.98 : 1
+                    Behavior on color { ColorAnimation { duration: 100 } }
+                    Behavior on scale { NumberAnimation { duration: 80 } }
+                    Column {
+                        anchors.verticalCenter: parent.verticalCenter; x: 12; spacing: 3
+                        Text { text: "Doğrudan indir"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
+                        Text { text: "Parola gerekmez, ev klasörüne iner"; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim }
+                    }
+                    MouseArea { id: o1; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.installLang(panel.choiceCode) }
+                }
+
+                // option 2
+                Rectangle {
+                    visible: panel.choiceCmd !== ""
+                    width: parent.width
+                    height: o2col.implicitHeight + 24
+                    radius: 8
+                    color: "transparent"
+                    border.width: 1; border.color: ScribeTheme.line
+                    Column {
+                        id: o2col
+                        x: 12; y: 12; width: parent.width - 24; spacing: 8
+                        Row {
+                            spacing: 8
+                            Text { text: "Paket yöneticisiyle kur"; font.family: ScribeTheme.mono; font.pixelSize: 13; font.weight: Font.Medium; color: ScribeTheme.text }
+                            Text { text: "parola ister"; anchors.baseline: parent.children[0].baseline; font.family: ScribeTheme.mono; font.pixelSize: 10; color: ScribeTheme.dim }
+                        }
+                        Rectangle {
+                            width: parent.width; height: cmdText.implicitHeight + 16; radius: 6
+                            color: "#080808"; border.width: 1; border.color: ScribeTheme.line
+                            Text { id: cmdText; x: 10; y: 8; width: parent.width - 20; wrapMode: Text.WrapAnywhere; text: panel.choiceCmd; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.text }
+                        }
+                        Row {
+                            spacing: 8
+                            visible: panel.terminalCode === ""
+                            ScribeBarButton { compact: true; label: "Komutu kopyala"; onActivated: panel.copyCommand() }
+                            ScribeBarButton { compact: true; label: "Terminalde çalıştır"; onActivated: panel.runTerminal(panel.choiceCode) }
+                        }
+                        Row {
+                            spacing: 8
+                            visible: panel.terminalCode !== ""
+                            Text { text: "Terminal açık, bitince liste yenilenir"; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.dim }
                         }
                     }
                 }
@@ -186,7 +277,7 @@ Rectangle {
             width: parent.width
             wrapMode: Text.Wrap
             text: panel.installMsg !== "" ? panel.installMsg
-                : "Paketler " + (panel.pmName || "indirme") + (panel.osName ? " (" + panel.osName + ")" : "") + " ile kurulur. Olmazsa doğrudan indirilir."
+                : "İndir'e basınca iki yol sunulur: parolasız doğrudan indirme ya da " + (panel.pmName || "paket yöneticisi") + (panel.osName ? " (" + panel.osName + ")" : "") + " ile kurulum (parola ister)."
             font.family: ScribeTheme.mono; font.pixelSize: 11; lineHeight: 1.4
             color: panel.installMsg !== "" ? ScribeTheme.text : ScribeTheme.faint
         }
