@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+*.part
+*.bak
+.DS_Store
+.impeccable/
