@@ -6,6 +6,17 @@ Ekranındaki yazıyı Google Lens gibi seç ve kopyala. Hyprland için bir Quick
 
 Bir tuşa bas, yazının üstüne bir kutu çiz (video, resim, PDF, terminal, kopyalanamayan bir uygulama) ve scribe okusun. Yazı ekranda olduğu yerde kalır. Üstünden sürükleyerek seç, seçimin üstünde çıkan küçük çubuktan **Kopyala**'ya bas.
 
+## Ekran görüntüleri
+
+Boş bir çalışma alanında, temiz bir Firefox profiliyle Wikipedia'daki Hyprland makalesi okunurken alındı.
+
+![](docs/assets/tr/03-select-text.webp)
+
+| | |
+|---|---|
+| ![](docs/assets/tr/01-select.webp) | ![](docs/assets/tr/02-scan.webp) |
+| ![](docs/assets/tr/04-settings.webp) | ![](docs/assets/tr/05-install-options.webp) |
+
 ## Özellikler
 
 - **Lens tarzı seçim.** Orijinal yazıya dokunulmaz. Kelimelerin üstünden sürüklemek, gerçek metin seçer gibi satır satır yarı saydam bir vurgu çizer.
@@ -13,7 +24,7 @@ Bir tuşa bas, yazının üstüne bir kutu çiz (video, resim, PDF, terminal, ko
 - **Tek pencere.** Alan seçimi, tarama animasyonu ve sonuç tek bir layer-shell penceresinde, adımlar arasında hiçbir şey yeniden yaratılmaz.
 - **Ayarlardan dil paketi.** Taramadan sonra sağ alttaki dişli ayarları açar. Eksik bir dil için seçersin: doğrudan ev klasörüne indir (parola yok) ya da dağıtımının paket yöneticisiyle (pacman, apt, dnf, apk) kur, ki bu parola ister. İkinci seçenek tam komutu gösterir, kopyalama ve terminalde çalıştırma düğmeleri vardır.
 - **Klavye ve fare.** `Ctrl+A` hepsini seçer, `Ctrl+C` ya da `Enter` kopyalar, `Esc` kapatır.
-- **Sakin arayüz.** Monokrom, JetBrains Mono, Hyprland'ın kendi animasyon eğrisi. Vurgu rengi ayarlanabilir.
+- **Sakin arayüz.** Monokrom, JetBrains Mono, Hyprland'ın kendi animasyon eğrisi. Vurgu rengi ayarlanabilir. Türkçe ve İngilizce arayüz, ayarlardan değiştirilir.
 
 ## Gereksinimler
 
@@ -68,7 +79,7 @@ Taramadan sonra sağ alttaki dişli paneli açar:
 - **Davranış.** Kopyalayınca kapat, okuyunca hepsini kopyala, paragraf satırlarını birleştir.
 - **Vurgu rengi.**
 
-Her şey modülün yanındaki `settings.json` dosyasında saklanır:
+Her şey `~/.config/scribe/settings.json` dosyasında saklanır (ilk değişiklikte oluşur, mod 600, yani güncellemeler üzerine yazmaz):
 
 | Anahtar | Varsayılan | Anlamı |
 |---|---|---|
@@ -78,6 +89,7 @@ Her şey modülün yanındaki `settings.json` dosyasında saklanır:
 | `joinLines` | `true` | paragraf satırlarını yeni satır yerine boşlukla birleştir |
 | `minConfidence` | `60` | ortalama güven bunun altındaysa sonuç "emin değil" diye işaretlenir |
 | `highlight` | `"#8ab4f8"` | seçim rengi |
+| `ui` | `"auto"` | arayüz dili: `auto` (`$LANG`'i izler), `tr` ya da `en` |
 
 ### Dil paketleri
 
@@ -93,7 +105,7 @@ Bir dilin yanındaki **İndir**'e basınca iki seçenekli küçük bir kart aç�
 | Fedora, RHEL, Nobara | `sudo dnf install -y tesseract-langpack-<kod>` |
 | Alpine | `sudo apk add tesseract-ocr-data-<kod>` |
 
-Başka bir dağıtımda yalnızca doğrudan indirme sunulur. `~/.local/share/scribe/tessdata` içindeki paketler sistemdekilerden önceliklidir. Aynı mantık komut satırında da var: `python3 langs.py info`, `install <kod>` (doğrudan), `install <kod> --pm` (`pkexec` ile paket yöneticisi), `command <kod>` ve `term <kod>`.
+Başka bir dağıtımda yalnızca doğrudan indirme sunulur. `~/.local/share/scribe/tessdata` içindeki paketler sistemdekilerden önceliklidir. Aynı mantık komut satırında da var: `python3 langs.py info`, `install <kod>` (doğrudan indirme), `command <kod>` ve `term <kod>`.
 
 ## Nasıl çalışır
 
@@ -111,6 +123,8 @@ kısayol ─▶ qs ipc call scribe start
 
 ## Geliştirici yardımcıları
 
+Bunlar yalnızca `$XDG_RUNTIME_DIR/scribe-dev` dosyası varken yanıt verir (önce `touch` ile oluştur), yani normal kullanıcı için etkisizdir.
+
 ```sh
 qs -p Shell.qml ipc call scribe test 340 120 700 260        # sürüklemeyi atla, bölgeyi oku
 qs -p Shell.qml ipc call scribe testsel 340 120 700 260 3 9 # aynısı, 3..9. kelimeler seçili
@@ -122,7 +136,14 @@ qs -p Shell.qml ipc call scribe cancel                       # her şeyi kapat
 
 - El yazısı ve çok küçük (yaklaşık 10 px altı) yazılar güvenilir okunmaz.
 - Yazı dolu bir 1080p ekranın tamamını okumak hâlâ yaklaşık bir saniye sürer.
-- Arayüz metinleri şimdilik Türkçe.
+
+## Güvenlik ve gizlilik
+
+scribe bir ekranın görüntüsünü alır, bu yüzden arkasında iz bırakmayacak şekilde yazıldı: görüntü yalnızca sahibine açık bir çalışma dizininde durur ve katman kapanınca silinir, hiçbir şey hiçbir yere gönderilmez, tek ağ isteği senin başlattığın dil paketi indirmesidir. Hiçbir zaman yetkili bir komut çalıştırmaz. Neyi okuyup yazdığının ve sınırlarının tam listesi için [SECURITY.md](SECURITY.md) dosyasına bak.
+
+```sh
+python3 -m unittest discover -s tests -v
+```
 
 ## Lisans
 

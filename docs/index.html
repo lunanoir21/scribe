@@ -6,6 +6,9 @@
 <title>scribe · select text on your screen, like Google Lens</title>
 <meta name="description" content="scribe is a Quickshell module for Hyprland. Drag a box around any text on screen, select it like real text and copy it.">
 <meta name="color-scheme" content="dark">
+<meta property="og:title" content="scribe">
+<meta property="og:description" content="Select and copy text from anywhere on your Hyprland screen, like Google Lens.">
+<meta property="og:image" content="https://raw.githubusercontent.com/lunanoir21/scribe/main/preview.png">
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='7' fill='%230a0a0a'/%3E%3Cpath d='M9 10h14M9 16h14M9 22h8' stroke='%238ab4f8' stroke-width='2.4' stroke-linecap='round'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -115,6 +118,12 @@ td code{font-size:13px;color:#d6d6d6}
 footer{margin-top:96px;border-top:1px solid var(--line);padding:30px 0 56px;color:var(--faint);font:13px var(--mono)}
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 28px}
 footer a{color:var(--dim)}
+.shots{margin-top:36px;display:grid;gap:22px;grid-template-columns:repeat(2,minmax(0,1fr))}
+.shots figure{margin:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.shots figure.wide{grid-column:1/-1}
+.shots img{display:block;width:100%;height:auto;background:#050505}
+.shots figcaption{padding:12px 16px;font:12.5px/1.5 var(--mono);color:var(--dim);border-top:1px solid var(--line)}
+@media(max-width:720px){.shots{grid-template-columns:1fr}}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}html{scroll-behavior:auto}}
 </style>
 </head>
@@ -123,6 +132,7 @@ footer a{color:var(--dim)}
   <div class="wrap">
     <a class="brand" href="#top">scribe</a>
     <div class="links">
+      <a href="#screens" data-en="Screenshots" data-tr="Görseller">Screenshots</a>
       <a href="#how" data-en="How it works" data-tr="Nasıl çalışır">How it works</a>
       <a href="#install" data-en="Install" data-tr="Kurulum">Install</a>
       <a href="#languages" data-en="Languages" data-tr="Diller">Languages</a>
@@ -151,6 +161,19 @@ footer a{color:var(--dim)}
     </div>
     <p class="hint" data-en="This is a mock-up in your browser. The real thing runs on your Hyprland desktop." data-tr="Bu, tarayıcıdaki bir taslak. Gerçeği Hyprland masaüstünde çalışır.">This is a mock-up in your browser. The real thing runs on your Hyprland desktop.</p>
   </header>
+
+  <section id="screens">
+    <p class="lab" data-en="Screenshots" data-tr="Ekran görüntüleri">Screenshots</p>
+    <h2 data-en="The real thing, on the Hyprland wiki page." data-tr="Gerçeği, Hyprland vikisi sayfasında.">The real thing, on the Hyprland wiki page.</h2>
+    <p class="lead" data-en="Captured on an empty workspace with a clean Firefox profile, reading Wikipedia's Hyprland article. Switch the language above and the screenshots switch too." data-tr="Boş bir çalışma alanında, temiz bir Firefox profiliyle Wikipedia'nın Hyprland makalesi okunurken alındı. Yukarıdan dili değiştirirsen görseller de değişir.">Captured on an empty workspace with a clean Firefox profile, reading Wikipedia's Hyprland article. Switch the language above and the screenshots switch too.</p>
+    <div class="shots">
+      <figure class="wide"><img data-img="03-select-text" alt="" data-alt-en="Words selected on the Hyprland Wikipedia page with the Copy toolbar above" data-alt-tr="Hyprland Wikipedia sayfasında seçilmiş kelimeler ve üstte Kopyala çubuğu" width="1920" height="1080" loading="lazy"><figcaption data-en="Drag over the words, then Copy. The original text is left untouched." data-tr="Kelimelerin üstünden sürükle, sonra Kopyala. Orijinal yazıya dokunulmaz.">Drag over the words, then Copy. The original text is left untouched.</figcaption></figure>
+      <figure><img data-img="01-select" alt="" data-alt-en="Dragging a region around a paragraph" data-alt-tr="Bir paragrafın çevresine alan sürükleniyor" width="1920" height="1080" loading="lazy"><figcaption data-en="1 · Drag a box around the text." data-tr="1 · Yazının çevresine bir kutu çiz.">1 · Drag a box around the text.</figcaption></figure>
+      <figure><img data-img="02-scan" alt="" data-alt-en="The scan line sweeping over the region while it is read" data-alt-tr="Alan okunurken üstünde gezinen tarama çizgisi" width="1920" height="1080" loading="lazy"><figcaption data-en="2 · A scan line shows it is being read." data-tr="2 · Tarama çizgisi okunduğunu gösterir.">2 · A scan line shows it is being read.</figcaption></figure>
+      <figure><img data-img="04-settings" alt="" data-alt-en="The settings panel with reading languages, behaviour toggles and highlight colour" data-alt-tr="Okuma dilleri, davranış anahtarları ve vurgu rengi olan ayar paneli" width="1920" height="1080" loading="lazy"><figcaption data-en="3 · The gear opens settings." data-tr="3 · Dişli ayarları açar.">3 · The gear opens settings.</figcaption></figure>
+      <figure><img data-img="05-install-options" alt="" data-alt-en="The card offering a direct download or the package manager command" data-alt-tr="Doğrudan indirme ya da paket yöneticisi komutu sunan kart" width="1920" height="1080" loading="lazy"><figcaption data-en="4 · Add a language: direct download, or the package manager command." data-tr="4 · Dil ekle: doğrudan indir ya da paket yöneticisi komutu.">4 · Add a language: direct download, or the package manager command.</figcaption></figure>
+    </div>
+  </section>
 
   <section>
     <p class="lab" data-en="Features" data-tr="Özellikler">Features</p>
@@ -239,12 +262,17 @@ cd scribe
 (function () {
   // ── language toggle ────────────────────────────────
   var lang = "en";
-  try { lang = localStorage.getItem("scribe-lang") || ((navigator.language || "").toLowerCase().indexOf("tr") === 0 ? "tr" : "en"); } catch (e) {}
+  var asked = (/[?&]lang=(en|tr)\b/.exec(location.search) || [])[1];
+  try { lang = asked || localStorage.getItem("scribe-lang") || ((navigator.language || "").toLowerCase().indexOf("tr") === 0 ? "tr" : "en"); } catch (e) {}
   function applyLang(l) {
     lang = l;
     document.documentElement.lang = l;
     document.querySelectorAll("[data-en]").forEach(function (el) { el.textContent = el.getAttribute("data-" + l) || el.getAttribute("data-en"); });
     document.querySelectorAll(".lang button").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.l === l)); });
+    document.querySelectorAll("img[data-img]").forEach(function (im) {
+      im.src = "assets/" + l + "/" + im.dataset.img + ".webp";
+      im.alt = im.getAttribute("data-alt-" + l) || "";
+    });
     try { localStorage.setItem("scribe-lang", l); } catch (e) {}
     if (typeof build === "function" && textEl) build();
   }

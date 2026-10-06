@@ -6,6 +6,17 @@ Select and copy text from anywhere on your screen, the way Google Lens does it. 
 
 Press a key, drag a box around any text (a video, an image, a PDF, a terminal, a locked-down app) and scribe reads it. The text stays exactly where it is on screen. Drag over it to select, then press **Copy** in the small toolbar that appears above the selection.
 
+## Screenshots
+
+Captured on an empty workspace with a clean Firefox profile, reading the Hyprland article on Wikipedia.
+
+![](docs/assets/en/03-select-text.webp)
+
+| | |
+|---|---|
+| ![](docs/assets/en/01-select.webp) | ![](docs/assets/en/02-scan.webp) |
+| ![](docs/assets/en/04-settings.webp) | ![](docs/assets/en/05-install-options.webp) |
+
 ## Features
 
 - **Lens-style selection.** Your original text is left untouched. Dragging over words draws a translucent highlight per line, like selecting real text.
@@ -13,7 +24,7 @@ Press a key, drag a box around any text (a video, an image, a PDF, a terminal, a
 - **One window.** Region picker, scanning animation and result all live in a single layer-shell window, so nothing is created or torn down between steps.
 - **Language packs from the settings panel.** After a scan, the gear in the bottom-right corner opens settings. For a missing language you choose: download it straight into your home folder (no password), or install it with your distro's package manager (pacman, apt, dnf, apk), which needs a password. The second option shows the exact command, with buttons to copy it or run it in a terminal.
 - **Keyboard and mouse.** `Ctrl+A` selects everything, `Ctrl+C` or `Enter` copies, `Esc` closes.
-- **Quiet UI.** Monochrome, JetBrains Mono, Hyprland's own animation curve. The highlight colour is configurable.
+- **Quiet UI.** Monochrome, JetBrains Mono, Hyprland's own animation curve. The highlight colour is configurable. English and Turkish interface, switchable in settings.
 
 ## Requirements
 
@@ -68,7 +79,7 @@ The gear in the bottom-right corner (shown after a scan) opens the panel:
 - **Behaviour.** Close after copy, copy everything right after reading, join the lines of a paragraph.
 - **Highlight colour.**
 
-Everything is stored in `settings.json` next to the module:
+Everything is stored in `~/.config/scribe/settings.json` (created on first change, mode 600, so upgrades never overwrite it):
 
 | Key | Default | Meaning |
 |---|---|---|
@@ -78,6 +89,7 @@ Everything is stored in `settings.json` next to the module:
 | `joinLines` | `true` | join the lines of a paragraph with spaces instead of newlines |
 | `minConfidence` | `60` | below this average confidence the result is flagged as unsure |
 | `highlight` | `"#8ab4f8"` | selection colour |
+| `ui` | `"auto"` | interface language: `auto` (follows `$LANG`), `tr` or `en` |
 
 ### Language packs
 
@@ -93,7 +105,7 @@ Pressing **Download** next to a language opens a small card with two options:
 | Fedora, RHEL, Nobara | `sudo dnf install -y tesseract-langpack-<code>` |
 | Alpine | `sudo apk add tesseract-ocr-data-<code>` |
 
-On any other distro only the direct download is offered. Packs in `~/.local/share/scribe/tessdata` win over system ones. The same logic is on the command line: `python3 langs.py info`, `install <code>` (direct), `install <code> --pm` (package manager through `pkexec`), `command <code>` and `term <code>`.
+On any other distro only the direct download is offered. Packs in `~/.local/share/scribe/tessdata` win over system ones. The same logic is on the command line: `python3 langs.py info`, `install <code>` (direct download), `command <code>` and `term <code>`.
 
 ## How it works
 
@@ -111,6 +123,8 @@ key bind ─▶ qs ipc call scribe start
 
 ## Development helpers
 
+These answer only while the file `$XDG_RUNTIME_DIR/scribe-dev` exists (`touch` it first), so they are inert for normal users.
+
 ```sh
 qs -p Shell.qml ipc call scribe test 340 120 700 260        # read a region, skip the drag
 qs -p Shell.qml ipc call scribe testsel 340 120 700 260 3 9 # same, with words 3..9 pre-selected
@@ -122,7 +136,14 @@ qs -p Shell.qml ipc call scribe cancel                       # close everything
 
 - Handwriting and very small text (under about 10 px) are not read reliably.
 - Reading a whole 1080p screen full of text still takes around a second.
-- The interface strings are Turkish for now.
+
+## Security and privacy
+
+scribe takes a screenshot of one monitor, so it is built to leave nothing behind: the screenshot lives in an owner-only runtime directory and is deleted when the overlay closes, nothing is sent anywhere, and the only network request is a language pack download you start yourself. It never runs a privileged command. See [SECURITY.md](SECURITY.md) for the full list of what it reads, writes and limits.
+
+```sh
+python3 -m unittest discover -s tests -v
+```
 
 ## License
 
