@@ -1,0 +1,237 @@
+import QtQuick
+
+// Settings card: which languages to read, install more for this OS, behaviour, colour.
+Rectangle {
+    id: panel
+
+    property var cfg: ({})
+    property var installed: []          // language codes that are installed
+    property string installing: ""      // code being installed right now
+    property int installPct: 0
+    property string installMsg: ""
+    property string pmName: ""          // e.g. "pacman"
+    property string osName: ""          // e.g. "CachyOS"
+
+    signal changeCfg(string key, var value)
+    signal installLang(string code)
+    signal closeRequested()
+
+    readonly property var catalog: [
+        { code: "tur", name: "Türkçe" }, { code: "eng", name: "İngilizce" },
+        { code: "deu", name: "Almanca" }, { code: "fra", name: "Fransızca" },
+        { code: "spa", name: "İspanyolca" }, { code: "ita", name: "İtalyanca" },
+        { code: "por", name: "Portekizce" }, { code: "nld", name: "Felemenkçe" },
+        { code: "pol", name: "Lehçe" }, { code: "ukr", name: "Ukraynaca" },
+        { code: "rus", name: "Rusça" }, { code: "ara", name: "Arapça" },
+        { code: "jpn", name: "Japonca" }, { code: "kor", name: "Korece" },
+        { code: "chi_sim", name: "Çince (Basit)" }
+    ]
+    readonly property var active: (cfg.langs || "").split("+").filter(function (x) { return x !== ""; })
+    readonly property var swatches: ["#8ab4f8", "#ffffff", "#81c995", "#fdd663", "#f28b82"]
+
+    function isInstalled(code) { return installed.indexOf(code) >= 0; }
+    function toggleLang(code) {
+        var a = active.slice();
+        var i = a.indexOf(code);
+        if (i >= 0) {
+            if (a.length === 1) return;            // always keep one
+            a.splice(i, 1);
+        } else {
+            a.push(code);
+        }
+        changeCfg("langs", a.join("+"));
+    }
+
+    width: 400
+    implicitHeight: col.implicitHeight + 36
+    radius: 12
+    color: "#0c0c0c"
+    border.width: 1
+    border.color: ScribeTheme.lineStrong
+    clip: true
+
+    MouseArea { anchors.fill: parent }      // clicks on blank card areas must not reach the dismiss layer
+
+    Column {
+        id: col
+        x: 18; y: 18
+        width: panel.width - 36
+        spacing: 14
+
+        // header
+        Item {
+            width: parent.width; height: 24
+            Text { text: "Ayarlar"; anchors.verticalCenter: parent.verticalCenter; font.family: ScribeTheme.mono; font.pixelSize: 14; font.weight: Font.DemiBold; color: ScribeTheme.text }
+            Rectangle {
+                anchors.right: parent.right
+                width: 24; height: 24; radius: 12
+                color: xMa.containsMouse ? "#2b2b2b" : "transparent"
+                Behavior on color { ColorAnimation { duration: 100 } }
+                Text { anchors.centerIn: parent; text: "×"; font.pixelSize: 16; color: ScribeTheme.dim }
+                MouseArea { id: xMa; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.closeRequested() }
+            }
+        }
+
+        // languages
+        Text { text: "OKUMA DİLLERİ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+
+        Rectangle {
+            width: parent.width
+            height: Math.min(listCol.implicitHeight, 232)
+            radius: 8
+            color: ScribeTheme.surface
+            border.width: 1
+            border.color: ScribeTheme.line
+            clip: true
+
+            Flickable {
+                anchors.fill: parent
+                contentHeight: listCol.implicitHeight
+                boundsBehavior: Flickable.StopAtBounds
+                Column {
+                    id: listCol
+                    width: parent.width
+                    Repeater {
+                        model: panel.catalog
+                        delegate: Item {
+                            id: row
+                            required property var modelData
+                            required property int index
+                            readonly property bool ok: panel.isInstalled(modelData.code)
+                            readonly property bool on: panel.active.indexOf(modelData.code) >= 0
+                            readonly property bool busy: panel.installing === modelData.code
+                            width: listCol.width
+                            height: 38
+
+                            Rectangle { visible: row.index > 0; width: parent.width; height: 1; color: ScribeTheme.line }
+
+                            // checkbox
+                            Rectangle {
+                                x: 12; anchors.verticalCenter: parent.verticalCenter
+                                width: 18; height: 18; radius: 4
+                                opacity: row.ok ? 1 : 0.35
+                                color: row.on && row.ok ? ScribeTheme.text : "transparent"
+                                border.width: 1
+                                border.color: row.on && row.ok ? ScribeTheme.text : ScribeTheme.lineStrong
+                                Behavior on color { ColorAnimation { duration: 120 } }
+                                Text {
+                                    anchors.centerIn: parent
+                                    visible: row.on && row.ok
+                                    text: "✓"; font.pixelSize: 12; font.weight: Font.Bold; color: ScribeTheme.ink
+                                }
+                                MouseArea { anchors.fill: parent; enabled: row.ok; cursorShape: Qt.PointingHandCursor; onClicked: panel.toggleLang(row.modelData.code) }
+                            }
+                            Text {
+                                x: 42; anchors.verticalCenter: parent.verticalCenter
+                                text: row.modelData.name
+                                font.family: ScribeTheme.mono; font.pixelSize: 13
+                                color: row.ok ? ScribeTheme.text : ScribeTheme.dim
+                            }
+                            Text {
+                                x: 150; anchors.verticalCenter: parent.verticalCenter
+                                text: row.modelData.code
+                                font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.faint
+                            }
+
+                            // state on the right
+                            Text {
+                                visible: row.ok
+                                anchors.right: parent.right; anchors.rightMargin: 14
+                                anchors.verticalCenter: parent.verticalCenter
+                                text: "kurulu"; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.faint
+                            }
+                            Row {
+                                visible: row.busy
+                                anchors.right: parent.right; anchors.rightMargin: 14
+                                anchors.verticalCenter: parent.verticalCenter
+                                spacing: 8
+                                Item {
+                                    width: 16; height: 16
+                                    anchors.verticalCenter: parent.verticalCenter
+                                    Canvas {
+                                        id: spin
+                                        anchors.fill: parent
+                                        onPaint: {
+                                            var c = getContext("2d");
+                                            c.clearRect(0, 0, width, height);
+                                            c.strokeStyle = "#ececec";
+                                            c.lineWidth = 2;
+                                            c.lineCap = "round";
+                                            c.beginPath();
+                                            c.arc(8, 8, 6, 0, Math.PI * 1.5);
+                                            c.stroke();
+                                        }
+                                    }
+                                    RotationAnimator on rotation { target: spin; from: 0; to: 360; duration: 800; loops: Animation.Infinite; running: row.busy }
+                                }
+                                Text { text: panel.installPct > 0 ? panel.installPct + "%" : "…"; font.family: ScribeTheme.mono; font.pixelSize: 11; color: ScribeTheme.dim; anchors.verticalCenter: parent.verticalCenter }
+                            }
+                            ScribeBarButton {
+                                visible: !row.ok && !row.busy
+                                compact: true
+                                anchors.right: parent.right; anchors.rightMargin: 8
+                                anchors.verticalCenter: parent.verticalCenter
+                                label: "İndir"
+                                enabled: panel.installing === ""
+                                opacity: enabled ? 1 : 0.4
+                                onActivated: panel.installLang(row.modelData.code)
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        Text {
+            width: parent.width
+            wrapMode: Text.Wrap
+            text: panel.installMsg !== "" ? panel.installMsg
+                : "Paketler " + (panel.pmName || "indirme") + (panel.osName ? " (" + panel.osName + ")" : "") + " ile kurulur. Olmazsa doğrudan indirilir."
+            font.family: ScribeTheme.mono; font.pixelSize: 11; lineHeight: 1.4
+            color: panel.installMsg !== "" ? ScribeTheme.text : ScribeTheme.faint
+        }
+
+        Rectangle { width: parent.width; height: 1; color: ScribeTheme.line }
+        Text { text: "DAVRANIŞ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+
+        Repeater {
+            model: [
+                { key: "closeAfterCopy", label: "Kopyalayınca kapat" },
+                { key: "autoCopy", label: "Okuyunca hepsini kopyala" },
+                { key: "joinLines", label: "Paragraf satırlarını birleştir" }
+            ]
+            delegate: Item {
+                required property var modelData
+                width: col.width; height: 28
+                Text { anchors.verticalCenter: parent.verticalCenter; text: modelData.label; font.family: ScribeTheme.mono; font.pixelSize: 13; color: ScribeTheme.text }
+                ScribeSwitch {
+                    anchors.right: parent.right; anchors.verticalCenter: parent.verticalCenter
+                    checked: !!panel.cfg[modelData.key]
+                    onToggled: v => panel.changeCfg(modelData.key, v)
+                }
+            }
+        }
+
+        Rectangle { width: parent.width; height: 1; color: ScribeTheme.line }
+        Text { text: "VURGU RENGİ"; font.family: ScribeTheme.mono; font.pixelSize: 10; font.letterSpacing: 1.4; font.weight: Font.DemiBold; color: ScribeTheme.dim }
+
+        Row {
+            spacing: 10
+            Repeater {
+                model: panel.swatches
+                delegate: Rectangle {
+                    required property string modelData
+                    readonly property bool sel: (panel.cfg.highlight || "").toLowerCase() === modelData
+                    width: 28; height: 28; radius: 14
+                    color: modelData
+                    border.width: sel ? 2 : 1
+                    border.color: sel ? "#ffffff" : "#3d3d3d"
+                    scale: sw.pressed ? 0.9 : (sw.containsMouse ? 1.08 : 1)
+                    Behavior on scale { NumberAnimation { duration: 90 } }
+                    Text { anchors.centerIn: parent; visible: parent.sel; text: "✓"; font.pixelSize: 13; font.weight: Font.Bold; color: "#0a0a0a" }
+                    MouseArea { id: sw; anchors.fill: parent; hoverEnabled: true; cursorShape: Qt.PointingHandCursor; onClicked: panel.changeCfg("highlight", parent.modelData) }
+                }
+            }
+        }
+    }
+}
