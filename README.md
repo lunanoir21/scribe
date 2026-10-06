@@ -58,6 +58,15 @@ The bind it adds:
 bind = SUPER SHIFT, T, exec, qs -p /path/to/Shell.qml ipc call scribe start
 ```
 
+### Omarchy
+
+On [Omarchy](https://omarchy.org) install it as a shell plugin instead, from the
+[scribe-omarchy](https://github.com/lunanoir21/scribe-omarchy) wrapper (a pinned copy of this module):
+
+```sh
+omarchy plugin add https://github.com/lunanoir21/scribe-omarchy.git --enable
+```
+
 ## Use
 
 1. Press `Super+Shift+T`. The screen freezes.

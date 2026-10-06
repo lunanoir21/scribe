@@ -58,6 +58,14 @@ Eklenen kısayol:
 bind = SUPER SHIFT, T, exec, qs -p /path/to/Shell.qml ipc call scribe start
 ```
 
+### Omarchy
+
+[Omarchy](https://omarchy.org)'de bunun yerine kabuk eklentisi olarak kur: [scribe-omarchy](https://github.com/lunanoir21/scribe-omarchy) bu modülün sabitlenmiş bir kopyasını taşıyan sarmalayıcıdır.
+
+```sh
+omarchy plugin add https://github.com/lunanoir21/scribe-omarchy.git --enable
+```
+
 ## Kullanım
 
 1. `Super+Shift+T`'ye bas. Ekran donar.
