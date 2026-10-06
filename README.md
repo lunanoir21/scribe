@@ -11,7 +11,7 @@ Press a key, drag a box around any text (a video, an image, a PDF, a terminal, a
 - **Lens-style selection.** Your original text is left untouched. Dragging over words draws a translucent highlight per line, like selecting real text.
 - **Fast.** The selection is cut into strips at blank rows and the strips are read by parallel Tesseract processes. A 1000×600 region takes about 0.6 s, a full 1080p screen about 1 s.
 - **One window.** Region picker, scanning animation and result all live in a single layer-shell window, so nothing is created or torn down between steps.
-- **Language packs from the settings panel.** After a scan, the gear in the bottom-right corner opens settings. Missing languages are installed with your distro's package manager (pacman, apt, dnf, apk), or downloaded straight into your home folder when that is not possible.
+- **Language packs from the settings panel.** After a scan, the gear in the bottom-right corner opens settings. For a missing language you choose: download it straight into your home folder (no password), or install it with your distro's package manager (pacman, apt, dnf, apk), which needs a password. The second option shows the exact command, with buttons to copy it or run it in a terminal.
 - **Keyboard and mouse.** `Ctrl+A` selects everything, `Ctrl+C` or `Enter` copies, `Esc` closes.
 - **Quiet UI.** Monochrome, JetBrains Mono, Hyprland's own animation curve. The highlight colour is configurable.
 
@@ -21,7 +21,6 @@ Press a key, drag a box around any text (a video, an image, a PDF, a terminal, a
 - `grim`, `wl-clipboard`
 - `tesseract` with at least one language pack
 - Python 3 with `numpy` and `pillow`
-- `pkexec` (polkit) is optional, only used to install language packs through the package manager
 
 ## Install
 
@@ -65,7 +64,7 @@ bind = SUPER SHIFT, T, exec, qs -p /path/to/Shell.qml ipc call scribe start
 
 The gear in the bottom-right corner (shown after a scan) opens the panel:
 
-- **Reading languages.** Tick the languages to read with. Languages you do not have show a **Download** button. The panel says which package manager it will use.
+- **Reading languages.** Tick the languages to read with. Languages you do not have show a **Download** button, which offers two ways to install (see below).
 - **Behaviour.** Close after copy, copy everything right after reading, join the lines of a paragraph.
 - **Highlight colour.**
 
@@ -82,15 +81,19 @@ Everything is stored in `settings.json` next to the module:
 
 ### Language packs
 
-| Distro family | Install method |
-|---|---|
-| Arch, CachyOS, Manjaro, EndeavourOS | `pacman -S tesseract-data-<code>` through `pkexec` |
-| Debian, Ubuntu, Mint, Pop!_OS | `apt-get install tesseract-ocr-<code>` through `pkexec` |
-| Fedora, RHEL, Nobara | `dnf install tesseract-langpack-<code>` through `pkexec` |
-| Alpine | `apk add tesseract-ocr-data-<code>` through `pkexec` |
-| anything else, or if the above fails | download `<code>.traineddata` from `tesseract-ocr/tessdata_fast` into `~/.local/share/scribe/tessdata` |
+Pressing **Download** next to a language opens a small card with two options:
 
-Packs in `~/.local/share/scribe/tessdata` win over system ones. The same logic is available on the command line: `python3 langs.py info` and `python3 langs.py install deu`.
+1. **Download directly.** Fetches `<code>.traineddata` from `tesseract-ocr/tessdata_fast` into `~/.local/share/scribe/tessdata`. No password, works on any distro.
+2. **Install with the package manager.** Needs a password, so scribe does not run it behind your back. It shows the command and gives you **Copy command** and **Run in terminal** (kitty, foot, alacritty, wezterm, konsole, gnome-terminal, xfce4-terminal or xterm, whichever you have; `$TERMINAL` wins). The list refreshes when the terminal closes.
+
+| Distro family | Command shown |
+|---|---|
+| Arch, CachyOS, Manjaro, EndeavourOS | `sudo pacman -S --needed tesseract-data-<code>` |
+| Debian, Ubuntu, Mint, Pop!_OS | `sudo apt-get install -y tesseract-ocr-<code>` |
+| Fedora, RHEL, Nobara | `sudo dnf install -y tesseract-langpack-<code>` |
+| Alpine | `sudo apk add tesseract-ocr-data-<code>` |
+
+On any other distro only the direct download is offered. Packs in `~/.local/share/scribe/tessdata` win over system ones. The same logic is on the command line: `python3 langs.py info`, `install <code>` (direct), `install <code> --pm` (package manager through `pkexec`), `command <code>` and `term <code>`.
 
 ## How it works
 

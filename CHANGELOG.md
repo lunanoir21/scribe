@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.1
+
+- Installing a language no longer asks for a password behind your back. The **Download** button opens a card with two options: download directly (no password), or install with the package manager, which shows the command with **Copy command** and **Run in terminal** buttons.
+- `langs.py`: `install` is a direct download by default, `--pm` keeps the `pkexec` route, new `command` and `term` subcommands.
+
 ## 0.1.0
 
 First release.

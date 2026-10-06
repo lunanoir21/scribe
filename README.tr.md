@@ -11,7 +11,7 @@ Bir tuşa bas, yazının üstüne bir kutu çiz (video, resim, PDF, terminal, ko
 - **Lens tarzı seçim.** Orijinal yazıya dokunulmaz. Kelimelerin üstünden sürüklemek, gerçek metin seçer gibi satır satır yarı saydam bir vurgu çizer.
 - **Hızlı.** Seçim boş satırlardan şeritlere kesilir ve şeritler paralel Tesseract süreçleriyle okunur. 1000×600'lük bir alan yaklaşık 0,6 sn, tam 1080p ekran yaklaşık 1 sn sürer.
 - **Tek pencere.** Alan seçimi, tarama animasyonu ve sonuç tek bir layer-shell penceresinde, adımlar arasında hiçbir şey yeniden yaratılmaz.
-- **Ayarlardan dil paketi.** Taramadan sonra sağ alttaki dişli ayarları açar. Eksik diller dağıtımının paket yöneticisiyle (pacman, apt, dnf, apk) kurulur, olmazsa doğrudan ev klasörüne indirilir.
+- **Ayarlardan dil paketi.** Taramadan sonra sağ alttaki dişli ayarları açar. Eksik bir dil için seçersin: doğrudan ev klasörüne indir (parola yok) ya da dağıtımının paket yöneticisiyle (pacman, apt, dnf, apk) kur, ki bu parola ister. İkinci seçenek tam komutu gösterir, kopyalama ve terminalde çalıştırma düğmeleri vardır.
 - **Klavye ve fare.** `Ctrl+A` hepsini seçer, `Ctrl+C` ya da `Enter` kopyalar, `Esc` kapatır.
 - **Sakin arayüz.** Monokrom, JetBrains Mono, Hyprland'ın kendi animasyon eğrisi. Vurgu rengi ayarlanabilir.
 
@@ -21,7 +21,6 @@ Bir tuşa bas, yazının üstüne bir kutu çiz (video, resim, PDF, terminal, ko
 - `grim`, `wl-clipboard`
 - En az bir dil paketiyle `tesseract`
 - `numpy` ve `pillow` ile Python 3
-- `pkexec` (polkit) isteğe bağlı, yalnızca dil paketlerini paket yöneticisiyle kurmak için
 
 ## Kurulum
 
@@ -65,7 +64,7 @@ bind = SUPER SHIFT, T, exec, qs -p /path/to/Shell.qml ipc call scribe start
 
 Taramadan sonra sağ alttaki dişli paneli açar:
 
-- **Okuma dilleri.** Okumak istediğin dilleri işaretle. Kurulu olmayan dillerde **İndir** düğmesi çıkar. Panel hangi paket yöneticisini kullanacağını söyler.
+- **Okuma dilleri.** Okumak istediğin dilleri işaretle. Kurulu olmayan dillerde **İndir** düğmesi çıkar, iki kurulum yolu sunar (aşağıya bak).
 - **Davranış.** Kopyalayınca kapat, okuyunca hepsini kopyala, paragraf satırlarını birleştir.
 - **Vurgu rengi.**
 
@@ -82,15 +81,19 @@ Her şey modülün yanındaki `settings.json` dosyasında saklanır:
 
 ### Dil paketleri
 
-| Dağıtım ailesi | Kurulum yöntemi |
-|---|---|
-| Arch, CachyOS, Manjaro, EndeavourOS | `pkexec` ile `pacman -S tesseract-data-<kod>` |
-| Debian, Ubuntu, Mint, Pop!_OS | `pkexec` ile `apt-get install tesseract-ocr-<kod>` |
-| Fedora, RHEL, Nobara | `pkexec` ile `dnf install tesseract-langpack-<kod>` |
-| Alpine | `pkexec` ile `apk add tesseract-ocr-data-<kod>` |
-| diğerleri ya da yukarıdaki başarısız olursa | `tesseract-ocr/tessdata_fast` içinden `<kod>.traineddata` dosyasını `~/.local/share/scribe/tessdata` içine indirir |
+Bir dilin yanındaki **İndir**'e basınca iki seçenekli küçük bir kart açılır:
 
-`~/.local/share/scribe/tessdata` içindeki paketler sistemdekilerden önceliklidir. Aynı mantık komut satırında da var: `python3 langs.py info` ve `python3 langs.py install deu`.
+1. **Doğrudan indir.** `tesseract-ocr/tessdata_fast` içinden `<kod>.traineddata` dosyasını `~/.local/share/scribe/tessdata` içine indirir. Parola yok, her dağıtımda çalışır.
+2. **Paket yöneticisiyle kur.** Parola ister, bu yüzden scribe bunu arkandan çalıştırmaz. Komutu gösterir ve **Komutu kopyala** ile **Terminalde çalıştır** düğmelerini verir (kitty, foot, alacritty, wezterm, konsole, gnome-terminal, xfce4-terminal ya da xterm, hangisi varsa; `$TERMINAL` önceliklidir). Terminal kapanınca liste yenilenir.
+
+| Dağıtım ailesi | Gösterilen komut |
+|---|---|
+| Arch, CachyOS, Manjaro, EndeavourOS | `sudo pacman -S --needed tesseract-data-<kod>` |
+| Debian, Ubuntu, Mint, Pop!_OS | `sudo apt-get install -y tesseract-ocr-<kod>` |
+| Fedora, RHEL, Nobara | `sudo dnf install -y tesseract-langpack-<kod>` |
+| Alpine | `sudo apk add tesseract-ocr-data-<kod>` |
+
+Başka bir dağıtımda yalnızca doğrudan indirme sunulur. `~/.local/share/scribe/tessdata` içindeki paketler sistemdekilerden önceliklidir. Aynı mantık komut satırında da var: `python3 langs.py info`, `install <kod>` (doğrudan), `install <kod> --pm` (`pkexec` ile paket yöneticisi), `command <kod>` ve `term <kod>`.
 
 ## Nasıl çalışır
 
