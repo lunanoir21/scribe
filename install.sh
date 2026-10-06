@@ -56,7 +56,9 @@ END="# <<< scribe (managed) <<<"
 QBEGIN="// >>> scribe (managed) >>>"        # QML comments
 QEND="// <<< scribe (managed) <<<"
 
-backup() { [ -f "$1" ] && [ ! -f "$1.scribe.bak" ] && cp "$1" "$1.scribe.bak" || true; }
+backup() {
+    if [ -f "$1" ] && [ ! -f "$1.scribe.bak" ]; then cp "$1" "$1.scribe.bak"; fi
+}
 
 # ── uninstall ────────────────────────────────────────────────────────────────
 if [ "$UNINSTALL" = 1 ]; then

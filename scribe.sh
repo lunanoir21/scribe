@@ -14,11 +14,11 @@ umask 077
 die() { printf 'ERR\t%s\n' "$1"; exit "${2:-70}"; }
 
 RUNTIME="${XDG_RUNTIME_DIR:-}"
-[ -n "$RUNTIME" ] && [ -d "$RUNTIME" ] && [ -O "$RUNTIME" ] || die norundir
+if [ -z "$RUNTIME" ] || [ ! -d "$RUNTIME" ] || [ ! -O "$RUNTIME" ]; then die norundir; fi
 RT="$RUNTIME/scribe"
 [ ! -L "$RT" ] || die symlink
 mkdir -p "$RT"
-[ -d "$RT" ] && [ -O "$RT" ] || die norundir
+if [ ! -d "$RT" ] || [ ! -O "$RT" ]; then die norundir; fi
 chmod 700 "$RT"          # also tightens a directory an older version created with looser rights
 
 case "${1:-}" in
