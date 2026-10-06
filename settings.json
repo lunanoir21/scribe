@@ -1,8 +1,0 @@
-{
-  "langs": "tur+eng",
-  "autoCopy": false,
-  "joinLines": true,
-  "minConfidence": 60,
-  "highlight": "#8ab4f8",
-  "closeAfterCopy": true
-}
