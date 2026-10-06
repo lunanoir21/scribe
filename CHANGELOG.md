@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.2.1
+
+- **Privacy fix:** the Copy path handed the recognised screen text to `sh -c 'printf %s "$1" | wl-copy'` as a command-line argument, which other local users can read from `/proc/<pid>/cmdline`. The text now goes to `wl-copy` through its stdin only, and no shell is started at all. A test fails if screen text ever reaches a command line again. (Thanks to the marketplace reviewer who traced this.)
+
 ## 0.2.0
 
 Security and robustness review, English interface, real screenshots.

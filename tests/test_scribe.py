@@ -250,7 +250,7 @@ class SourceRuleTests(unittest.TestCase):
             self.assertNotIn("openUrlExternally", text, p.name)
 
     def test_qml_runs_only_expected_programs(self):
-        allowed_sh_c = 1              # ScribeHost.copy(): printf %s "$1" | wl-copy
+        allowed_sh_c = 0              # no QML code runs a shell at all
         count = 0
         for p in self.files(".qml"):
             text = p.read_text()
@@ -258,6 +258,17 @@ class SourceRuleTests(unittest.TestCase):
             for call in re.findall(r"execDetached\(\[([^\]]*)\]", text):
                 self.assertTrue(call.strip().startswith('"notify-send"'), f"{p.name}: {call}")
         self.assertLessEqual(count, allowed_sh_c)
+
+    def test_copied_text_never_reaches_a_command_line(self):
+        """Screen text must go to wl-copy through stdin: arguments are readable by other users."""
+        host = (ROOT / "ui" / "ScribeHost.qml").read_text()
+        self.assertIn('command: ["wl-copy"]', host)
+        self.assertIn("stdinEnabled", host)
+        self.assertIn("write(host.pendingCopy)", host)
+        self.assertNotIn("printf", host)
+        for p in self.files(".qml"):
+            for command in re.findall(r"\.command\s*=\s*\[([^\]]*)\]", p.read_text()):
+                self.assertNotIn("text", command.replace("context", ""), f"{p.name}: {command}")
 
     def test_every_tesseract_run_has_a_timeout_and_every_download_a_size_cap(self):
         self.assertIn("timeout=STRIP_TIMEOUT", (ROOT / "ocr.py").read_text())

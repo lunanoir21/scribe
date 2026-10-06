@@ -11,7 +11,7 @@ This page says what it touches, what it never does, and how to report a problem.
 | Temporary crops for tesseract | a private `tempfile` directory | Removed as soon as the read ends. |
 | Settings | `~/.config/scribe/settings.json` | Mode `600`, atomic write. Only six known keys with strict types and ranges are ever read or written. |
 | Language packs you download | `~/.local/share/scribe/tessdata/` | Only when you press **Download directly**. |
-| Clipboard | through `wl-copy` | Only the text you copy. |
+| Clipboard | through `wl-copy` | Only the text you copy, handed to `wl-copy` on its **stdin**. It never appears on a command line, where other local users could read it (`/proc/<pid>/cmdline`). |
 
 scribe never reads any other file of yours, never writes outside the places above, and `ocr.py` refuses to open an image that is not scribe's own screenshot.
 
@@ -41,7 +41,7 @@ Every stage that handles unbounded data has a limit, so a huge selection or a ho
 
 ## Inputs
 
-Language codes, output names, settings and key specs are validated before they reach a command line: language codes must match `^[a-z]{2,3}(_[a-z]{2,8})?$`, output names `^[A-Za-z0-9._:-]{1,64}$`, the installer's `--key` only letters, digits, space, comma, `+` and `_`. Commands are always argument lists, never shell strings (the single `sh -c` in the shell host copies text with `printf %s "$1" | wl-copy`, with the text passed as an argument).
+Language codes, output names, settings and key specs are validated before they reach a command line: language codes must match `^[a-z]{2,3}(_[a-z]{2,8})?$`, output names `^[A-Za-z0-9._:-]{1,64}$`, the installer's `--key` only letters, digits, space, comma, `+` and `_`. Commands are always argument lists, never shell strings, and no shell is started anywhere in the QML code. Text that came from the screen is never part of a command line.
 
 ## Developer helpers
 
