@@ -5,6 +5,11 @@
 **New: scan animation**
 - Pick the animation shown while a region is being read, in the settings panel (**Scan animation**): **Line** (the old sweep, still the default), **Row by row**, **Shine**, **Pixels**, **Outline** or **Focus**. A small preview plays in the panel, and picking one replays it over the region on screen. New settings key `scanAnim`, validated by `config.py`.
 
+**Faster**
+- Dragging over words no longer rebuilds the selection on every mouse move; it only changes when the range changes.
+- The "text found" flash draws one box per line instead of one per word (up to 4000 items), and finding the word under the pointer checks the previous word first.
+- The screenshot is decoded off the UI thread.
+
 ## 0.3.0
 
 Translation, a dictionary, smart actions, and better reading of hard backgrounds.
