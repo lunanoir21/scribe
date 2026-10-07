@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.4.0
+
+A choice of scan animations, and less work per mouse move and per word.
 
 **New: scan animation**
 - Pick the animation shown while a region is being read, in the settings panel (**Scan animation**): **Line** (the old sweep, still the default), **Row by row**, **Shine**, **Pixels**, **Outline** or **Focus**. A small preview plays in the panel, and picking one replays it over the region on screen. New settings key `scanAnim`, validated by `config.py`.
