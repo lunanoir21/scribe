@@ -100,6 +100,7 @@ Her şey `~/.config/scribe/settings.json` dosyasında saklanır (ilk değişikli
 | `joinLines` | `true` | paragraf satırlarını yeni satır yerine boşlukla birleştir |
 | `minConfidence` | `60` | ortalama güven bunun altındaysa sonuç "emin değil" diye işaretlenir |
 | `highlight` | `"#8ab4f8"` | seçim rengi |
+| `scanAnim` | `"line"` | okurken gösterilen animasyon: `line`, `rows`, `shine`, `pixels`, `ring` veya `focus` |
 | `ui` | `"auto"` | arayüz dili: `auto` (`$LANG`'i izler), `tr` ya da `en` |
 | `translate` | `false` | çeviriyle ilgili her şeyin ana anahtarı |
 | `autoTranslate` | `false` | yazı okunur okunmaz çevir (modeli o zaman yükler) |

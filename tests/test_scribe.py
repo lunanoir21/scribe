@@ -43,6 +43,13 @@ class ConfigTests(unittest.TestCase):
             self.assertEqual(config.clean(bad), {}, bad)
         self.assertEqual(config.clean("not a dict"), {})
 
+    def test_scan_animation_must_be_one_of_the_known_names(self):
+        for name in config.SCAN_ANIMS:
+            self.assertEqual(config.clean({"scanAnim": name}), {"scanAnim": name})
+        self.assertEqual(config.DEFAULTS["scanAnim"], "line")
+        for bad in ("words", "", "LINE", "../x", 3, None, True):
+            self.assertEqual(config.clean({"scanAnim": bad}), {}, bad)
+
     def test_write_is_private_atomic_and_merged(self):
         with tempfile.TemporaryDirectory() as home, mock.patch.dict(os.environ, {"XDG_CONFIG_HOME": home}):
             merged = config.save({"ui": "en", "highlight": "#8ab4f8", "bogus": 1})

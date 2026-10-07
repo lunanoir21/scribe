@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+**New: scan animation**
+- Pick the animation shown while a region is being read, in the settings panel (**Scan animation**): **Line** (the old sweep, still the default), **Row by row**, **Shine**, **Pixels**, **Outline** or **Focus**. A small preview plays in the panel, and picking one replays it over the region on screen. New settings key `scanAnim`, validated by `config.py`.
+
 ## 0.3.0
 
 Translation, a dictionary, smart actions, and better reading of hard backgrounds.

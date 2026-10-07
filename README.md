@@ -101,6 +101,7 @@ Everything is stored in `~/.config/scribe/settings.json` (created on first chang
 | `joinLines` | `true` | join the lines of a paragraph with spaces instead of newlines |
 | `minConfidence` | `60` | below this average confidence the result is flagged as unsure |
 | `highlight` | `"#8ab4f8"` | selection colour |
+| `scanAnim` | `"line"` | animation shown while reading: `line`, `rows`, `shine`, `pixels`, `ring` or `focus` |
 | `ui` | `"auto"` | interface language: `auto` (follows `$LANG`), `tr` or `en` |
 | `translate` | `false` | master switch for everything translation related |
 | `autoTranslate` | `false` | translate as soon as the text is read (loads the model then) |

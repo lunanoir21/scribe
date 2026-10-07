@@ -34,6 +34,18 @@ PanelWindow {
     property string choiceCmd: ""
     property string terminalCode: ""
     property bool settingsOpen: false
+    // picking a scan animation in the settings replays it over the region on screen for a moment
+    property bool previewScan: false
+    property string lastScanAnim: ""
+    onCfgChanged: {
+        var a = (cfg && cfg.scanAnim) || "line";
+        if (lastScanAnim !== "" && a !== lastScanAnim && phase === "result" && settingsOpen) {
+            previewScan = true;
+            previewScanTimer.restart();
+        }
+        lastScanAnim = a;
+    }
+    Timer { id: previewScanTimer; interval: 2600; onTriggered: win.previewScan = false }
     property var tr: null                // ScribeTranslator: translation, dictionary, smart actions
     signal translateRequested(string text)
     signal chooseLang(string code)
@@ -315,23 +327,14 @@ PanelWindow {
             opacity: 0.85
         }
 
-        // reading: sweeping line
-        Item {
-            visible: win.phase === "reading"
+        // reading: the animation picked in the settings
+        ScribeScanFx {
+            z: 5
+            visible: win.phase === "reading" || win.previewScan
             x: win.rx; y: win.ry; width: win.rw; height: win.rh
-            clip: true
-            Rectangle { width: parent.width; height: 36; y: sweepLine.y - height; color: "#ffffff"; opacity: 0.10 }
-            Rectangle {
-                id: sweepLine
-                width: parent.width; height: 2
-                color: "#ffffff"
-                SequentialAnimation on y {
-                    running: win.phase === "reading"
-                    loops: Animation.Infinite
-                    NumberAnimation { from: 0; to: win.rh; duration: 800; easing.type: Easing.InOutQuad }
-                    PauseAnimation { duration: 100 }
-                }
-            }
+            kind: (win.cfg && win.cfg.scanAnim) || "line"
+            accent: win.highlight
+            running: win.phase === "reading" || win.previewScan
         }
         Rectangle {
             visible: win.phase === "reading"
