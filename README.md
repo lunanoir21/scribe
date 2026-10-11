@@ -1,10 +1,17 @@
 # scribe
 
+![built with Claude Code](https://img.shields.io/badge/built%20with-Claude%20Code-D97757)
+![AI-assisted](https://img.shields.io/badge/AI--assisted-yes-e6edf3)
+![directed by human](https://img.shields.io/badge/directed%20by-human-3d444d)
+
 Select and copy text from anywhere on your screen, the way Google Lens does it. A Quickshell module for Hyprland.
 
 [Website](https://lunanoir21.github.io/scribe/) · [Docs](https://lunanoir21.github.io/scribe/docs.html) · [Türkçe](README.tr.md) · [Changelog](CHANGELOG.md)
 
 Press a key, drag a box around any text (a video, an image, a PDF, a terminal, a locked-down app) and scribe reads it. The text stays exactly where it is on screen. Drag over it to select, then press **Copy** in the small toolbar that appears above the selection.
+
+> [!IMPORTANT]
+> **Built with AI.** This project was largely written with [Claude Code](https://claude.com/claude-code). The ideas, design decisions, testing and final review are mine.
 
 ## Screenshots
 
